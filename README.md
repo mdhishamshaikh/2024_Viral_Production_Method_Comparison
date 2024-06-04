@@ -1,1 +1,1 @@
-# 2024_Viral_Production_Method_ComparisonViral Production Method Comparison
+# Viral Production Method Comparison
