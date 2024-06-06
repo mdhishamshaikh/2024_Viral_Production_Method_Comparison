@@ -12,7 +12,7 @@ library(viralprod)
 ####1.0 Creating a simulation dataframe####
 
 # #Set number of dataframes you'd like to create
-simu_length<- 10
+simu_length<- 1000
 {
   set.seed(2023) #Setting seed for reproducibility
   simu_df<- data.frame(matrix(ncol = 5, nrow = 0))
@@ -67,7 +67,7 @@ write.csv(simu_df, file = "data/simulation_df.csv", row.names = F)
 simu_df<- read.csv("./data/simulation_df.csv")
 
 #Checks before viralprod
-vp_class_count_data(simu_df) #failed
+try(vp_class_count_data(simu_df)) #failed
 
 str(simu_df)
 
@@ -87,10 +87,10 @@ simu_df<- vp_class_count_data(simu_df)
 
 #Running viralprod calculate function to extract viral production rate
 
-viralprod::vp_calculate(simu_df,
+try(viralprod::vp_calculate(simu_df,
         output_dir = "./results/simulation_viral_production/",
         SR_calc = F,
-        bp_endpoint = F)
+        bp_endpoint = F))
 
 
 simu_vp_all<- read.csv("./results/simulation_viral_production/vp_results_ALL.csv")
