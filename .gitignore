@@ -61,13 +61,7 @@ rsconnect/
 *.svg
 *.pdf
 
-/data/raw_fcs_data/
-/data/raw_fcs_data/*
-!/data/raw_fcs_data/.gitkeep
-/results/004_bacterial_production_endpoint/Ba_vs_Vi/data/raw_data/*
-!/results/004_bacterial_production_endpoint/Ba_vs_Vi/data/raw_data/.gitkeep
-/results/004_bacterial_production_endpoint/NJ2020/data/raw_data/*
-!/results/004_bacterial_production_endpoint/NJ2020/data/raw_data/.gitkeep
-/results/004_bacterial_production_endpoint/NJ2020_abundance/data/raw_data/*
-!/results/004_bacterial_production_endpoint/NJ2020_abundance/data/raw_data/.gitkeep
-/results/002_simulation/simulation_viralprod_results/vp_results_ANALYZED.csv
+/data/raw_data/
+/data/raw_data/*
+!/data/raw_data/.gitkeep
+/results/*
