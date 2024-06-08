@@ -64,5 +64,5 @@ rsconnect/
 /data/raw_data/
 /data/raw_data/*
 !/data/raw_data/.gitkeep
+/results/*
 !/results/.gitkeep
-/results/

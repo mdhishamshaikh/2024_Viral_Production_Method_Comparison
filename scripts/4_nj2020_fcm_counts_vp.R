@@ -175,14 +175,14 @@ try(viralprod::vp_end_to_end(nj2020,
                             BP_endpoint = T))
 
 
-simu_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
+nj2020_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
 
-unique(simu_vp_all$VP_Method)
-unique(simu_vp_all$Station_Number)
-str(simu_vp_all)
+unique(nj2020_vp_all$VP_Method)
+unique(nj2020_vp_all$Station_Number)
+str(nj2020_vp_all)
 
-simu_vp_all <- simu_vp_all %>%
+nj2020_vp_all <- nj2020_vp_all %>%
   mutate(Station_Number = as.numeric(Station_Number))
-str(simu_vp_all)
+str(nj2020_vp_all)
 
 
