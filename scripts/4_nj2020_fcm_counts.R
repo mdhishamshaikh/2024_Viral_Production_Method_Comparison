@@ -69,3 +69,120 @@ get_bv_plots(test = T)
 #### 5.0 Extracting FCM count ####
 get_bv_plots()
 get_bv_stats()
+
+#### 6.0 Tris-EDTA (TE) control examination ####
+
+#Combining counts and metadata
+counts <- as.data.frame(read_csv("./results/nj2020_fcm/counts/nj2020_fcm_counts.csv")) %>%
+  mutate(file_name = str_replace_all(file_name, "\\.1$", ""))
+
+combine_metadata_counts()
+
+#Separate the dataframe containing TE
+TE<- counts_metadata[counts_metadata$Sample_Type == 'TE',]
+plotly::ggplotly(ggplot(data = TE[TE$Staining_Protocol == 'Viruses',], aes(x = Sample_Name ,y = V1V2V3))+
+                   
+                   geom_point(shape = 1))
+
+{
+#Use this to identify off TEs. Perhaps, we could get rid of all the TEs that are above 2000. Ideally TEs should eb below 500, but the FCM was acting up.
+TE<- TE%>% dplyr::filter(V1V2V3 <2000)
+plotly::ggplotly(ggplot(data = TE[TE$Staining_Protocol == 'Viruses',], aes(x = Sample_Name ,y = V1V2V3))+
+                   geom_point(shape = 1))
+#Looking at this i could also get rid of values above 1000 as there aren't any consecutive TEs above 1000
+TE<- TE %>% dplyr::filter( V1V2V3 <1000)
+plotly::ggplotly(ggplot(data = TE[TE$Staining_Protocol == 'Viruses',], aes(x = Sample_Name ,y = V1V2V3))+
+                   geom_point(shape = 1))
+
+#Outlier analysis 1
+
+z_scores <- scale(TE$V1V2V3)  #compute the z-score
+outliers <- (TE$V1V2V3)[abs(z_scores) > 3]
+outliers
+
+#Looking at this i could also get rid of values above 900 as there aren't any consecutive TEs above 1000
+TE<- TE %>% dplyr::filter( V1V2V3 <900)
+plotly::ggplotly(ggplot(data = TE[TE$Staining_Protocol == 'Viruses',], aes(x = Sample_Name ,y = V1V2V3))+
+                   geom_point(shape = 1))
+
+#Outlier analysis 2
+z_scores <- scale(TE$V1V2V3)  #compute the z-score
+outliers <- (TE$V1V2V3)[abs(z_scores) > 3]
+outliers
+
+#Looking at this i could also get rid of values above 900 as there aren't any consecutive TEs above 1000
+TE<- TE %>% dplyr::filter( V1V2V3 >31)
+plotly::ggplotly(ggplot(data = TE[TE$Staining_Protocol == 'Viruses',], aes(x = Sample_Name ,y = V1V2V3))+
+                   geom_point(shape = 1))
+}
+
+#Now we need to remove all the TEs we got rid of
+
+calc_TE()
+
+
+#Let's examine the output of this script.
+plotly::ggplotly(ggplot(data = counts_metadata, aes(x = Sample_Name ,y = TE_Vi))+
+                   geom_point(shape = 1))
+#The TE values look good.Except for the 800 something values
+#We can now adjust the TE values
+
+adjust_TE()
+
+#### 7.0 Visualization ####
+
+nj2020<- read.csv("./results/nj2020_fcm/nj2020_fcm_corrected_counts.csv")
+
+viral_count_overview_plots(nj2020)
+bacterial_count_overview_plots(nj2020)
+
+
+#### 8.0 Calculating viral production ####
+
+
+#Importing simulation dataset
+nj2020<- read.csv("./results/nj2020_fcm/nj2020_fcm_corrected_counts.csv")
+
+#Checks before viralprod
+try(vp_class_count_data(nj2020)) #failed
+
+str(nj2020)
+
+#Adjusting columns
+nj2020 <- nj2020 %>%
+  mutate(across(all_of(c("Timepoint", "Replicate")), ~ as.numeric(as.character(.))),
+         across(all_of(c("Location", "Sample_Type")), as.character),
+         across(all_of(c("Depth", "Station_Number")), ~as.integer(as.character(.))))
+
+str(nj2020)
+
+vp_class_count_data(nj2020) #passed
+
+#Assigning the class
+nj2020<- vp_class_count_data(nj2020)
+
+# NJ2020 original bacterial and viral abundance
+
+nj2020_abundance<- read.csv("./data/metadata/nj2020_original_abundances.csv")
+
+#Running viralprod calculate function to extract viral production rate
+
+
+try(viralprod::vp_end_to_end(nj2020,
+                             original_abundances = nj2020_abundance,
+                            output_dir = "./results/nj2020_viral_production/",
+                            SR_calc = T,
+                            BP_endpoint = T))
+
+
+simu_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
+
+unique(simu_vp_all$VP_Method)
+unique(simu_vp_all$Station_Number)
+str(simu_vp_all)
+
+simu_vp_all <- simu_vp_all %>%
+  mutate(Station_Number = as.numeric(Station_Number))
+str(simu_vp_all)
+
+

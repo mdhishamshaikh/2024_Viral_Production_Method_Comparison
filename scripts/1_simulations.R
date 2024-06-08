@@ -56,8 +56,9 @@ for(col in cols_to_add) {
   simu_df[[col]] <- 1
 }
 
+dir.create("./data/simulated_dataset/", recursive = T)
 #Writing csv
-write.csv(simu_df, file = "data/simulation_df.csv", row.names = F)
+write.csv(simu_df, file = "data/simulated_dataset/simulation_df.csv", row.names = F)
 
 
 
@@ -90,7 +91,7 @@ simu_df<- vp_class_count_data(simu_df)
 try(viralprod::vp_calculate(simu_df,
         output_dir = "./results/simulation_viral_production/",
         SR_calc = F,
-        bp_endpoint = F))
+        BP_endpoint = F))
 
 
 simu_vp_all<- read.csv("./results/simulation_viral_production/vp_results_ALL.csv")

@@ -9,7 +9,8 @@
                        "readxl",
                        "ggcyto",
                        "ggsci",
-                       "svglite")
+                       "svglite",
+                       "devtools")
   
   {
     if (!requireNamespace("BiocManager"))
@@ -27,6 +28,14 @@
     library(pack, character.only = T)
   }
   
+  #Installing and loading the viralprod package from GitHub
+  if (!requireNamespace("viralprod", quietly = TRUE)) {
+    library(devtools)
+    devtools::install_github("mdhishamshaikh/ViralProduction_R", force = TRUE)  # Ensure latest version
+    library(viralprod)
+  } else {
+    library(viralprod)
+  }
   
   
   rm(pack)
@@ -66,7 +75,7 @@ metadata_processing<- function(file_path, extension = ".xlsx", sheet =NULL, form
   }
   
   metadata<- metadata[, c('Sample_Name', 'Staining_Protocol', 'Date_Measurement', 
-                          'Location', 'Expt_Date', 'Expt_No', 'Depth', 
+                          'Location', 'Expt_Date', 'Station_Number', 'Depth', 
                           'Sample_Type', 'Timepoint', 'Replicate', 'Acquisition_Duration',
                           'Dilution', 'Flowrate')] %>%
     mutate(Expt_Date = as.Date(as.character(Expt_Date), format)) %>% #converting Expt_Date and Date_Measurement into Date format
@@ -200,7 +209,7 @@ get_bv_stats <- function(df = metadata, gate = "same", write_csv = TRUE, test = 
       dir.create(results_dir, recursive = TRUE)
     } else {
       # Creating directory with project title under results if not a test
-      results_dir <- paste0(base_dir, project_title, "/stats/")
+      results_dir <- paste0(base_dir, project_title, "/counts/")
       dir.create(results_dir, recursive = TRUE)
     }
   } else {
@@ -338,21 +347,21 @@ get_bv_plots <- function(df = metadata, gate = "same", write_pdf = TRUE, test = 
 # 3.0 Wrangling ####
 combine_metadata_counts <- function(metadata_df = metadata, counts_df = counts){
   
-  counts<- pivot_wider(counts_df, names_from = "pop", values_from = "count")
+  counts_pivot<- pivot_wider(counts_df, names_from = "pop", values_from = "count")
   #dim(counts)
-  colnames(counts)[colnames(counts) == 'root'] <- "Total"
-  colnames(counts)[colnames(counts) == 'file_name'] <- "Sample_Name"
-  #head(counts)
+  colnames(counts_pivot)[colnames(counts_pivot) == 'root'] <- "Total"
+  colnames(counts_pivot)[colnames(counts_pivot) == 'file_name'] <- "Sample_Name"
+  #head(counts_pivot)
   
   
-  if (length(setdiff(counts$Sample_Name, metadata_df$Sample_Name)) > 0) {
+  if (length(setdiff(counts_pivot$Sample_Name, metadata_df$Sample_Name)) > 0) {
     print("There are samples that were counted but doesn't have associated metadata")
   } else {
     print("All samples processed have associated metadata")
   }
   
   {
-    counts_metadata<- base::merge(counts, metadata_df, by = "Sample_Name") 
+    counts_metadata<- base::merge(counts_pivot, metadata_df, by = "Sample_Name") 
     #counts_metadata<- dplyr::mutate(counts_metadata,Expt_Date = as.Date(as.character(Expt_Date), format= "%y%m%d"))
     #counts_metadata<- dplyr::mutate(counts_metadata,Date_Measurement = as.Date(as.character(Date_Measurement), format= "%y%m%d"))
     #flowrate<- dplyr::mutate(flowrate, Date_Measurement = as.Date(as.character(Date_Measurement), format= "%y%m%d"))
@@ -482,14 +491,14 @@ adjust_TE<- function(counts_metadata_df = counts_metadata, write_csv = T){
     
     otpt_df<- counts_metadata[counts_metadata$Sample_Type != 'TE',]
     otpt_df<- otpt_df[, c('Sample_Name', 'Staining_Protocol', 'Expt_Date', 'Date_Measurement',
-                          'Location', 'Expt_No', 'Depth', 'Sample_Type', 'Timepoint', 'Replicate', 'c_Bacteria', 'c_HNA', 'c_LNA', 
+                          'Location', 'Station_Number', 'Depth', 'Sample_Type', 'Timepoint', 'Replicate', 'c_Bacteria', 'c_HNA', 'c_LNA', 
                           'c_Viruses', 'c_V1', 'c_V2', 'c_V3', 'VBR', 'HNAperLNA')]
     otpt_df<- otpt_df[
       with(otpt_df,
            order(
              otpt_df[, 'Staining_Protocol'],
              otpt_df[, 'Location'],
-             otpt_df[, 'Expt_No'],
+             otpt_df[, 'Station_Number'],
              otpt_df[, 'Depth'],
              otpt_df[, 'Timepoint'],
              otpt_df[, 'Replicate'],
@@ -498,8 +507,8 @@ adjust_TE<- function(counts_metadata_df = counts_metadata, write_csv = T){
            )),
     ]
   }
-  if (write_csv == T){
-    write.csv(otpt_df, paste0("./results/", project_title, ".csv"), row.names = F)
+  if (write_csv){
+    write.csv(otpt_df, paste0("./results/", project_title, "/", project_title, "_corrected_counts.csv"), row.names = F)
   }
   print("Counts were adjusted with TE")
   return(otpt_df)
@@ -507,7 +516,7 @@ adjust_TE<- function(counts_metadata_df = counts_metadata, write_csv = T){
 }
 
 bacterial_count_overview_plots<- function(data){
-  plot1<- ggplot(data = NJ2020, aes(x = Sample_Type, y = c_Bacteria, col = as.factor(Expt_No), group = interaction(Sample_Type,Expt_No)))+
+  plot1<- ggplot(data = data, aes(x = Sample_Type, y = c_Bacteria, col = as.factor(Station_Number), group = interaction(Sample_Type,Station_Number)))+
     geom_violin(aes(group = Sample_Type, fill = Sample_Type), alpha = 0.15, color = NA)+
     labs(fill = "Sample Type")+
     scale_fill_lancet()+
@@ -523,11 +532,11 @@ bacterial_count_overview_plots<- function(data){
     scale_shape_manual(values = c(19, 0, 1, 2, 3, 4, 7, 8, 10, 15))
   
   print(plot1)
-  ggsave("./results/TotalBacteria_perSampleType.svg", width = 20, height = 20, units = "cm")
+  ggsave(paste0("./results/", project_title, "/quick_overview_plots/TotalBacteria_perSampleType.svg"), width = 20, height = 20, units = "cm")
   
   
-  plot2<- ggplot(data = NJ2020, aes(x = as.factor(Expt_No), y = c_Bacteria, col = as.factor(Sample_Type), group = interaction(Sample_Type,Expt_No)))+
-    geom_violin(aes(group = as.factor(Expt_No), fill = as.factor(Expt_No)), alpha = 0.25, color = NA)+
+  plot2<- ggplot(data = data, aes(x = as.factor(Station_Number), y = c_Bacteria, col = as.factor(Sample_Type), group = interaction(Sample_Type,Station_Number)))+
+    geom_violin(aes(group = as.factor(Station_Number), fill = as.factor(Station_Number)), alpha = 0.25, color = NA)+
     labs(fill = "Expt No")+
     scale_fill_lancet()+
     geom_boxplot( fill = 'white', outlier.alpha =0)+
@@ -542,12 +551,12 @@ bacterial_count_overview_plots<- function(data){
     scale_shape_manual(values = c(19, 0, 1, 2, 3, 4, 7, 8, 10, 15))
   
   print(plot2)
-  ggsave("./results/TotalBacteria_perExptNo.svg", width = 30, height = 20, units = "cm")
+  ggsave(paste0("./results/", project_title, "/quick_overview_plots/TotalBacteria_perExptNo.svg"), width = 30, height = 20, units = "cm")
   
 }
 
 viral_count_overview_plots<- function(data){
-  plot1<- ggplot(data = NJ2020, aes(x = Sample_Type, y = c_Viruses, col = as.factor(Expt_No), group = interaction(Sample_Type,Expt_No)))+
+  plot1<- ggplot(data = data, aes(x = Sample_Type, y = c_Viruses, col = as.factor(Station_Number), group = interaction(Sample_Type,Station_Number)))+
     geom_violin(aes(group = Sample_Type, fill = Sample_Type), alpha = 0.15, color = NA)+
     labs(fill = "Sample Type")+
     scale_fill_lancet()+
@@ -563,10 +572,10 @@ viral_count_overview_plots<- function(data){
     scale_shape_manual(values = c(19, 0, 1, 2, 3, 4, 7, 8, 10, 15))
   
   print(plot1)
-  ggsave("./results/TotalViruses_perSampleType.svg", width = 20, height = 20, units = "cm")
+  ggsave(paste0("./results/", project_title, "/quick_overview_plots/TotalViruses_perSampleType.svg"), width = 20, height = 20, units = "cm")
   
-  plot2<- ggplot(data = NJ2020, aes(x = as.factor(Expt_No), y = c_Viruses, col = as.factor(Sample_Type), group = interaction(Sample_Type,Expt_No)))+
-    geom_violin(aes(group = as.factor(Expt_No), fill = as.factor(Expt_No)), alpha = 0.25, color = NA)+
+  plot2<- ggplot(data = data, aes(x = as.factor(Station_Number), y = c_Viruses, col = as.factor(Sample_Type), group = interaction(Sample_Type,Station_Number)))+
+    geom_violin(aes(group = as.factor(Station_Number), fill = as.factor(Station_Number)), alpha = 0.25, color = NA)+
     labs(fill = "Expt No")+
     scale_fill_lancet()+
     geom_boxplot( fill = 'white', outlier.alpha =0)+
@@ -582,6 +591,6 @@ viral_count_overview_plots<- function(data){
   
   
   print(plot2)
-  ggsave("./results/TotalViruses_perExptNo.svg", width = 30, height = 20, units = "cm")
+  ggsave(paste0("./results/", project_title, "/quick_overview_plots/TotalViruses_perExptNo.svg"), width = 30, height = 20, units = "cm")
   
 }
