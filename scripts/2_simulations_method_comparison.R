@@ -127,7 +127,7 @@ comp_lm_vs_vpcl %>%
   count(Comparison) %>%
   mutate(Percentage = n / sum(n) * 100)
 
-# VIPCAL-SE provides zero estimations more readily
+# VIPCAL provides zero estimations more readily
 comp_lm_vs_vpcl %>% 
   filter(Sample_Type == 'Lytic') %>%
   count(ZeroStatus) %>%
@@ -162,6 +162,7 @@ simu_vp_vpcl_se_methods <- simu_vp_vpcl_se_methods %>%
   )
 
 rm(replacements)
+
 
 
 #### 3.2 Choosing VIPCAL-SE method  - statistical analysis ####
