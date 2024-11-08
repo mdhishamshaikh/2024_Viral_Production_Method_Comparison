@@ -6,7 +6,7 @@ library(viralprod)
 
 
 caribbean<- readxl::read_xlsx("./data/caribbean_vp_assays/caribbean_vp_assay.xlsx")
-caribbean <- caribbean %>% select(-c(c_Bacteria, c_HNA, c_LNA, c_V1, c_V2, c_V3))
+caribbean <- caribbean %>% select(-c(c_HNA, c_LNA, c_V1, c_V2, c_V3))
 
 
 #Checks before viralprod
@@ -43,7 +43,7 @@ caribbean_abundance<- read.csv("./data/metadata/caribbean_original_abundances.cs
 #Running viralprod calculate function to extract viral production rate
 
 
-try(viralprod::vp_end_to_end(caribbean,
+try(viralprod::vp_end_to_end(caribbean ,
                              original_abundances = caribbean_abundance,
                              output_dir = "./results/caribbean_viral_production/",
                              SR_calc = T,

@@ -5,7 +5,8 @@
 
 work_dir<- paste0(getwd(), "/") # work_dir is an important variable for further calculations
 project_title<- "nj2020_fcm" # project title
-source("./scripts/3_nj2020_fcm_count_source.R")
+source("./scripts/4
+       _nj2020_fcm_count_source.R")
 set_up_vp_count()
 
 #### 1.0 Importing metadata ####
@@ -173,16 +174,17 @@ try(viralprod::vp_end_to_end(nj2020,
                             output_dir = "./results/nj2020_viral_production/",
                             SR_calc = T,
                             BP_endpoint = T))
-
-
-nj2020_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
-
-unique(nj2020_vp_all$VP_Method)
-unique(nj2020_vp_all$Station_Number)
-str(nj2020_vp_all)
-
-nj2020_vp_all <- nj2020_vp_all %>%
-  mutate(Station_Number = as.numeric(Station_Number))
-str(nj2020_vp_all)
-
-
+# 
+# # Some checks
+# 
+# nj2020_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
+# 
+# unique(nj2020_vp_all$VP_Method)
+# unique(nj2020_vp_all$Station_Number)
+# str(nj2020_vp_all)
+# 
+# nj2020_vp_all <- nj2020_vp_all %>%
+#   mutate(Station_Number = as.numeric(Station_Number))
+# str(nj2020_vp_all)
+# 
+# 

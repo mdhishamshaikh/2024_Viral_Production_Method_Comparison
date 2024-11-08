@@ -1,6 +1,6 @@
 #### 0.0 Setting up ####
 
-library(tidyverse)
+source("./scripts/0_source.R")
 
 
 nj2020_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
@@ -20,7 +20,7 @@ nj2020_vp_filtered <- nj2020_vp_all %>%
 
 #### 1.0 Comparing lytic and lysogenic viral production between VIPCAL and VIPCAL-SE at T0-T24 ####
 
-# 1,1 Wrangling data frame
+# 1.1 Wrangling data frame
 nj2020_vp_24<- nj2020_vp_filtered %>%
   dplyr::filter(Time_Range == 'T0_T24',
                 VP_Method %in% c("VPCL_AR_DIFF", "VPCL_AR_DIFF_SE"))
@@ -104,7 +104,7 @@ ggplot(nj2020_vp_plot_df ,  # Filter for both conditions
 nj2020_vp_24<- read.csv("./results/nj2020_viral_production/vp_results_24.csv") %>%
   mutate(Timepoint = 'T24') 
 nj2020_vp_bp<- read.csv("./results/nj2020_viral_production/vp_results_BP.csv") %>%
-  mutate(Timepoint = 'BP')
+  mutate(Timepoint = 'GTE')
 
 nj2020_24_bp <- bind_rows(nj2020_vp_24, nj2020_vp_bp) %>%
   dplyr::filter(VP_Method == "VPCL_AR_DIFF_SE",
@@ -134,20 +134,28 @@ nj2020_24_bp <- bind_rows(nj2020_vp_24, nj2020_vp_bp) %>%
     Station_Number = factor(Station_Number)
   )
 
-ggplot(nj2020_24_bp ,  
-       aes(x = Station_Number, y = VP, fill = Timepoint)) +
+gte_vs_t24 <- ggplot(nj2020_24_bp ,  
+       aes(x = Station_Number, y = VP/1e+6, fill = Timepoint)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.7, color = 'black') +
-  geom_errorbar(aes(ymin = VP - VP_SE, ymax = VP + VP_SE),
+  geom_errorbar(aes(ymin = (VP - VP_SE)/1e+6, ymax = (VP + VP_SE)/1e+6),
                 position = position_dodge(width = 0.7), width = 0.25) +
-  labs(title = "NJ2020 Viral Production",
-       x = "Station Number",
-       y = "Viral Production (VP)",
+  labs(#title = "NJ2020 Viral Production",
+       #y = expression("Viral production rate" ~ (x ~ 10^6 ~ "VLPs" ~ mL^-1 ~ h^-1)),
+       #x = "Time (hours)",
+    x = NULL,
+    y = NULL,
        fill = "Assay Duration") +
-  scale_fill_manual(values = c("T24" = "#d43028", "BP" = "#4d778b")) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.0))) +
+  scale_fill_manual(values = c("T24" = "#2A9D8F", "GTE" = "#F6CD61")) +
+  #scale_y_continuous(labels = scales::label_math(expr = 10^.x)) + 
+  scale_y_continuous(expand = expansion(add = c(0, 0.0))) +
   facet_wrap(~ Sample_Type, ncol = 2, scales = "fixed") +  # Use 'facet_wrap' with free y-axis scaling
-  theme_classic() +
-  theme(strip.background = element_blank() )
+  theme_classic(base_size = 18) +
+  theme(strip.background = element_blank())
+
+gte_vs_t24
+
+ggsave(plot = gte_vs_t24 + theme(legend.position = 'none'), filename = "./figures/gte_vs_t24.png", dpi = 800, width = 200, height = 80, units = "mm")
+ggsave(plot = gte_vs_t24, filename = "./figures/gte_vs_t24_legend.svg", dpi = 800, width = 200, height = 80, units = "mm")
 
 
 
@@ -311,7 +319,7 @@ cr_plot1<- ggplot()+
   scale_color_manual(values = cols#, breaks = 'VP', labels = 'Bacterial Endpoint'
   )+
   scale_shape_manual(values = shapes)+
-  theme(strip.background = element_lank,
+  theme(strip.background = element_blank(),
         strip.text = element_text(face = 'bold',
                                   color = 'white',
                                   size = 10),
@@ -470,6 +478,12 @@ ggsave(file = 'collision_rate_ww.png', width = 10,
        height = 18, unit = 'cm')
 
 
+
+
+##### LM-S, VIPCAL, VIPCAL-SE (T24), VIPCAL_SE_GTE ####
+
+nj2020_vp_all<- read.csv("./results/nj2020_viral_production/vp_results_ALL.csv")
+nj2020_vp_bp<- read.csv("./results/nj2020_viral_production/vp_results_BP.csv")
 
 
 

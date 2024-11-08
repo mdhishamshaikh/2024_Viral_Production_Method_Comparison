@@ -1,0 +1,6 @@
+Location,Station_Number,Sample_Type,Timepoint,Replicate
+DNS,1,VP,6,3
+,,,20,2
+,,,24,1
+,,VPC,6,2
+,,,17,2

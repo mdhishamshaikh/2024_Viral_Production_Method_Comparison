@@ -1,15 +1,9 @@
 #Aim: To generate simulation dataset to comparatively assess viral production analyses methods.
 
-####0.0 Setting up the environment####
+#0.0 Setting up the environment####
+source("./scripts/0_source.R")
 
-# Installing packages
-library(tidyverse)
-library(devtools)
-#install_github("mdhishamshaikh/ViralProduction_R") #viralprod package
-library(viralprod)
-
-
-####1.0 Creating a simulation dataframe####
+#1.0 Creating a simulation dataframe####
 
 # #Set number of dataframes you'd like to create
 simu_length<- 1000
@@ -94,13 +88,17 @@ try(viralprod::vp_calculate(simu_df,
         BP_endpoint = F))
 
 
-simu_vp_all<- read.csv("./results/simulation_viral_production/vp_results_ALL.csv")
-
-unique(simu_vp_all$VP_Method)
-str(simu_vp_all)
-
-simu_vp_all <- simu_vp_all %>%
-  mutate(Station_Number = as.numeric(Station_Number))
+# 
+# 
+# # Some checks
+# 
+# simu_vp_all<- read.csv("./results/simulation_viral_production/vp_results_ALL.csv")
+# 
+# unique(simu_vp_all$VP_Method)
+# str(simu_vp_all)
+# 
+# simu_vp_all <- simu_vp_all %>%
+#   mutate(Station_Number = as.numeric(Station_Number))
 
 
 
