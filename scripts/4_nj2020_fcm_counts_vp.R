@@ -141,7 +141,7 @@ bacterial_count_overview_plots(nj2020)
 #### 8.0 Calculating viral production ####
 
 
-#Importing simulation dataset
+#Importing nj2020 dataset
 nj2020<- read.csv("./results/nj2020_fcm/nj2020_fcm_corrected_counts.csv")
 
 #Checks before viralprod

@@ -6,8 +6,8 @@ source("./scripts/0_source.R")
 # 1.0 Importing per mL counts ####
 
 nj_counts <- read.csv("./results/nj2020_fcm/nj2020_fcm_corrected_counts.csv")
-pe_counts <- read.csv("./data/vp_assays/counts_per_ml/pe_cruises_vp_assay_fcm_counts_per_mL.csv")
-cr_counts <- readxl::read_xlsx("./data/vp_assays/counts_per_ml/caribbean_vp_assay_fcm_counts_per_mL.xlsx")
+pe_counts <- read.csv("./data/vp_assays/counts_per_ml/pe_cruises_vp_assay_fcm_counts_per_ml.csv")
+cr_counts <- readxl::read_xlsx("./data/vp_assays/counts_per_ml/caribbean_vp_assay_fcm_counts_per_ml.xlsx")
 
 # Combining all counts df
 counts <- rbind(nj_counts, pe_counts, cr_counts) %>% 
@@ -63,6 +63,8 @@ plot_viral_abundance(file_path = "./results/vp_assays/viral_counts/vdc_plot_per_
 
 # Visualizing difference curves with VP and VPC
 average_counts_diff_with_errors <- calculate_mean_viral_count_diff_with_errors(filtered_counts_without_outliers)
+
+write.csv(average_counts_diff_with_errors, "./results/vp_assays/viral_counts/average_counts_diff_with_errors.csv", row.names = F)
 
 plot_mean_viral_abundance(file_path = "./results/vp_assays/viral_counts/vdc_plot_with_diff_per_location_station_without_outliers.pdf",
                      data = average_counts_diff_with_errors,
@@ -125,4 +127,5 @@ vp_end_to_end(data = vp_counts ,
               original_abundances = abundance,
               methods = c(2,9,10),
               write_output = T,
-              output_dir = './results/viralprod')
+              output_dir = './results/viralprod2')
+

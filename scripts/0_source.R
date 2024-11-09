@@ -1,6 +1,8 @@
 
 
 # 0. Loading essential packages  ####
+
+set.seed(2024)
 load_or_install <- function(package) {
   if (!require(package, character.only = TRUE)) {
     install.packages(package, dependencies = TRUE)
@@ -13,7 +15,9 @@ packages_to_load <- c("tidyverse",
                       "data.table",
                       "readxl",
                       "devtools",
-                      "dunn.test")
+                      "dunn.test",
+                      "dplyr",
+                      "pracma")
 
 lapply(packages_to_load, load_or_install)
 
@@ -21,7 +25,7 @@ lapply(packages_to_load, load_or_install)
 {
   if (!requireNamespace("viralprod", quietly = TRUE)) {
   devtools::install_github("mdhishamshaikh/ViralProduction_R")
-}
+3}
 library(viralprod)
 }
 #lme4 needs to be installed from source
