@@ -1,21 +1,68 @@
+# Settin gup 
 
-cr_df<- read.csv("./results/nj2020_fcm/nj2020_fcm_corrected_counts.csv")
-library(tidyverse)
-library(data.table)
-library(cowplot)
-library(ggpubr)
-library(colorspace)
+source("./scripts/0_source.R")
 
 
 
+cr_df<- read.csv("./results/vp_assays/viral_counts/filtered_counts_without_outliers.csv")
+cr_df <- cr_df %>%
+  group_by(Location) %>%
+  mutate(Station_Rank = dense_rank(Station_Number)) %>%
+  ungroup() %>%
+  mutate(Station_code = paste(Location, Station_Rank, sep = "-")) %>%
+  group_by(Station_code, Sample_Type, Timepoint) %>%
+  summarise(
+    Mean_c_Bacteria = mean(c_Bacteria, na.rm = TRUE),
+    Mean_c_Viruses = mean(c_Viruses, na.rm = TRUE),
+    BV = Mean_c_Bacteria * Mean_c_Viruses
+  ) %>%
+  ungroup()
+
+
+
+cr_list<- list()
+
+for (code in unique(cr_df$Station_code)){
+    for(type in unique(cr_df$Sample_Type)){
+        
+        df10<- cr_df %>%
+          dplyr::filter(Station_code == code,
+                        Sample_Type == type)
+        
+        for(time in unique(cr_df$Timepoint)){
+          
+          cr<-  (df10 %>% dplyr::filter(Timepoint == time))$BV/(df10 %>% dplyr::filter(Timepoint == 0))$BV
+          print(cr)
+          cr_value<- c(code, type, time, cr)
+          
+          cr_list[[length(cr_list)+1]]<- cr_value
+        
+        
+    
+    }
+  }
+}
+
+
+cr_opt<- data.table(data.table::transpose(as.data.table(cr_list)))
+colnames(cr_opt)<- c("Station_code", "Sample_Type", "Timepoint",
+                     "rate")
+cr_opt$rate <- as.numeric(cr_opt$rate)
+#Warnings are because of o.22 samples that have negative amount of bacteria. This could be due to TE corection.
+#We either get call the bacterial count as 0 and calculate for 0.22 or exclude it from further analyses.
+#For now, we'll exclude it.
+cr_opt <- cr_opt %>% dplyr::filter(Sample_Type != '0.22') %>%
+  na.omit()
+
+
+
+write.csv(cr_opt, "./results/vp_assays/viral_counts/contact_rates.csv", row.names = F)
 
 
 
 
-cr_df<- cr_df %>% select(c("Location", "Station_Number", "Sample_Type", "Timepoint",
-                           "Replicate", "c_Bacteria", "c_Viruses", "VBR"))
 
-abundance<- read.csv("./data/metadata/nj2020_original_abundances.csv")
+abundance <- read.csv("./data/metadata/bacterial_viral_abundances_abiotic.csv")
 
 abundance1<- abundance %>%
   select(Location, Station_Number, Total_Bacteria, Total_Viruses, VBR) %>%

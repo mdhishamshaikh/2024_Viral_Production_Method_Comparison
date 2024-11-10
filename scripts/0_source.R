@@ -17,7 +17,12 @@ packages_to_load <- c("tidyverse",
                       "devtools",
                       "dunn.test",
                       "dplyr",
-                      "pracma")
+                      "pracma",
+                      "cowplot",
+                      "ggpubr",
+                      "colorspace",
+                      "plotrix",
+                      "ggnewscale")
 
 lapply(packages_to_load, load_or_install)
 
