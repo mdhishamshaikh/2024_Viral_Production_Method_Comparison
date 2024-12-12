@@ -1,5 +1,3 @@
-
-
 # 0. Loading essential packages  ####
 
 set.seed(2024)
@@ -22,9 +20,11 @@ packages_to_load <- c("tidyverse",
                       "ggpubr",
                       "colorspace",
                       "plotrix",
-                      "ggnewscale")
+                      "ggnewscale",
+                      "patchwork")
 
 lapply(packages_to_load, load_or_install)
+
 
 # Installing viralprod R package
 {

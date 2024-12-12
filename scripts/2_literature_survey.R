@@ -1,10 +1,6 @@
 # Loading essential libraries.
 
 source("./scripts/0_source.R")
-packages_to_load <- c("tidyverse",
-                      "ggsci")
-lapply(packages_to_load, load_or_install)
-
 
 # 1.0 Importing the literature survey sheet ####
 
@@ -66,14 +62,13 @@ tally_df_expanded <- tally_df_expanded %>%
 
 # 3.0 Visualization ####
 
-# Ensure 'Combined' is a factor for consistent plotting
 tally_df_expanded$Combined <- factor(tally_df_expanded$Combined)
 colors <- c("LR" = "#DC2828", "VIPCAL" = "#003049")
 shapes <- c("Lytic" = 15, "Lysogenic" = 17)
 
 
 
-# Plot the cumulative graph using the expanded data
+# Plotting the cumulative graph using the expanded data
 vp_lit_plot<- ggplot(tally_df_expanded, aes(x = Year_Published, y = Cumulative_Count)) +
   geom_line(aes(color = Method_Used, group = interaction(Method_Used, Study_Type)), size = 0.5) +
   geom_point(aes(shape = Study_Type, color = Method_Used), size = 2.0) +

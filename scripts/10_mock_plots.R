@@ -13,12 +13,12 @@ mock_df <-  tibble(
 
 # Now adding viral counts
 
-mock_df$Count <- c(5.0, 4.2, 5.9, 5.4, 6.5, 6.3,
+mock_df$Count <- c(5.0, 4.2, 5.9, 5.4, 6.5, 6.1,
                    4.9, 4.1, 6.3, 5.3, 6.7, 6.8,
-                   5.3, 4.3, 6.4, 5.8, 6.1, 7.3,
-                   4.7, 4.2, 5.8, 5.0, 6.4, 7.3,
-                   4.6, 4.5, 6.2, 5.1, 6.8, 7.8,
-                   5.0, 4.4, 6.3, 5.2, 6.2, 7.9)
+                   5.3, 4.3, 6.4, 5.8, 6.1, 7.9,
+                   4.7, 4.2, 5.8, 5.9, 6.4, 7.3,
+                   4.6, 4.5, 6.2, 5.1, 6.3, 7.8,
+                   5.0, 4.4, 6.3, 6.2, 5.7, 7.9)
 
 
 
@@ -69,11 +69,49 @@ ggplot(mock_df, aes(x = Timepoint, y = Count, color = as.factor(Replicate))) +
 
 
 
+
+# Viral counts over time
+
+vp_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Count)) +
+  geom_point() +
+  #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
+  #geom_point(data = summary_df, aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 17) +
+  #geom_errorbar(data = summary_df, aes(x = Timepoint, ymin = Mean - SEM, ymax = Mean + SEM), width = 0.2, color = "black", inherit.aes = F) +
+  #facet_grid(cols = vars(Treatment), scales = "fixed") +
+  ylim(c(4, 8)) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme_classic(base_size = 18)
+
+vp_plot
+
+ggsave(plot = vp_plot, filename = "./figures/vp_plot.png", dpi = 800, width = 70, height = 70, units = "mm")
+
+vpc_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Count)) +
+  geom_point() +
+  #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ffd166") + 
+  #geom_point(data = summary_df, aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 17) +
+  #geom_errorbar(data = summary_df, aes(x = Timepoint, ymin = Mean - SEM, ymax = Mean + SEM), width = 0.2, color = "black", inherit.aes = F) +
+  #facet_grid(cols = vars(Treatment), scales = "fixed") +
+  ylim(c(4, 8)) +
+  xlab(NULL) +
+  ylab(NULL) +
+  theme_classic(base_size = 18)
+
+vpc_plot
+
+ggsave(plot = vpc_plot, filename = "./figures/vpc_plot.png", dpi = 800, width = 70, height = 70, units = "mm")
+
+
+
+
+
+
 # LM plots ####
 # LM Lytic 
 
 
-lm_vp_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Count)) +
+lm_vp_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VP') %>%dplyr::mutate(Count = if_else(Timepoint == 'T1', NA_real_, Count)), aes(x = Timepoint, y = Count)) +
   geom_point() +
   geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
   #geom_point(data = summary_df, aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 17) +
@@ -89,7 +127,7 @@ lm_vp_plot
 ggsave(plot = lm_vp_plot, filename = "./figures/lm_vp_plot.png", dpi = 800, width = 70, height = 70, units = "mm")
 
 # LM Lytic + Lysogenic
-lm_vpc_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Count)) +
+lm_vpc_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VPC') %>%dplyr::mutate(Count = if_else(Timepoint == 'T1', NA_real_, Count)), aes(x = Timepoint, y = Count)) +
   geom_point() +
   geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ffd166") + 
   #geom_point(data = summary_df, aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 17) +
@@ -113,7 +151,7 @@ ggsave(plot = lm_vpc_plot, filename = "./figures/lm_vpc_plot.png", dpi = 800, wi
 vipcal_vp_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Count)) +
   geom_point(alpha = 0.3) +
   #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
-  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean, group = 1), color = "#ef476f", inherit.aes = F) +
+  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean, group = 1), color = "#ef476f", inherit.aes = F, linewidth = 1) +
   geom_point(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 15) +
   #geom_errorbar(data = summary_df, aes(x = Timepoint, ymin = Mean - SEM, ymax = Mean + SEM), width = 0.2, color = "black", inherit.aes = F) +
   #facet_grid(cols = vars(Treatment), scales = "fixed") +
@@ -130,7 +168,7 @@ ggsave(plot = vipcal_vp_plot, filename = "./figures/vipcal_vp_plot.png", dpi = 8
 vipcal_vpc_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Count)) +
   geom_point(alpha = 0.3) +
   #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
-  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean, group = 1), color = "#ffd166", inherit.aes = F) +
+  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean, group = 1), color = "#ffd166", inherit.aes = F, linewidth = 1) +
   geom_point(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 19) +
   #geom_errorbar(data = summary_df, aes(x = Timepoint, ymin = Mean - SEM, ymax = Mean + SEM), width = 0.2, color = "black", inherit.aes = F) +
   #facet_grid(cols = vars(Treatment), scales = "fixed") +
@@ -147,7 +185,7 @@ ggsave(plot = vipcal_vpc_plot, filename = "./figures/vipcal_vpc_plot.png", dpi =
 vipcal_diff_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Count)) +
   geom_point(alpha = 0.3) +
   #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
-  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean, group = 1), color = "#26547c", inherit.aes = F) +
+  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean, group = 1), color = "#26547c", inherit.aes = F, linewidth = 1) +
   geom_point(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 17) +
   #geom_errorbar(data = summary_df, aes(x = Timepoint, ymin = Mean - SEM, ymax = Mean + SEM), width = 0.2, color = "black", inherit.aes = F) +
   #facet_grid(cols = vars(Treatment), scales = "fixed") +
@@ -169,7 +207,7 @@ ggsave(plot = vipcal_diff_plot, filename = "./figures/vipcal_diff_plot.png", dpi
 vipcal_se_vp_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Count)) +
   geom_point(alpha = 0.3) +
   #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
-  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean, group = 1), color = "#ef476f", inherit.aes = F) +
+  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean, group = 1), color = "#ef476f", inherit.aes = F, linewidth = 1) +
   geom_point(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 15) +
   geom_pointrange(data = summary_df %>% dplyr::filter(Treatment == 'VP'), aes(x = Timepoint, y = Mean, ymin = Mean - SEM, ymax = Mean + SEM),  color = "black", inherit.aes = F) +
   #facet_grid(cols = vars(Treatment), scales = "fixed") +
@@ -186,7 +224,7 @@ ggsave(plot = vipcal_se_vp_plot, filename = "./figures/vipcal_se_vp_plot.png", d
 vipcal_se_vpc_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Count)) +
   geom_point(alpha = 0.3) +
   #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
-  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean, group = 1), color = "#ffd166", inherit.aes = F) +
+  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean, group = 1), color = "#ffd166", inherit.aes = F, linewidth = 1) +
   geom_point(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 19) +
   geom_pointrange(data = summary_df %>% dplyr::filter(Treatment == 'VPC'), aes(x = Timepoint, y = Mean, ymin = Mean - SEM, ymax = Mean + SEM),  color = "black", inherit.aes = F) +
   #facet_grid(cols = vars(Treatment), scales = "fixed") +
@@ -203,7 +241,7 @@ ggsave(plot = vipcal_se_vpc_plot, filename = "./figures/vipcal_se_vpc_plot.png",
 vipcal_se_diff_plot<- ggplot(mock_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Count)) +
   geom_point(alpha = 0.3) +
   #geom_smooth(aes(group = Replicate), method = "lm", se = FALSE, color = "#ef476f") + 
-  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean, group = 1), color = "#26547c", inherit.aes = F) +
+  geom_line(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean, group = 1), color = "#26547c", inherit.aes = F, linewidth = 1) +
   geom_point(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean), color = "black", size = 3, shape = 17) +
   geom_pointrange(data = summary_df %>% dplyr::filter(Treatment == 'Diff'), aes(x = Timepoint, y = Mean, ymin = Mean - SEM, ymax = Mean + SEM),  color = "black", shape = 17, inherit.aes = F) +
   #facet_grid(cols = vars(Treatment), scales = "fixed") +

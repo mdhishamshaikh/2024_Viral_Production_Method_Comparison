@@ -53,6 +53,11 @@ print(dunn_test_results)
 
 
 #### 1.3 LR methods - basic plots ####
+simu_vp_lr <- simu_vp_lr %>%
+  mutate(VP_Method = recode(VP_Method, 
+                            LR_1 = "LR-1",
+                            LR_2 = "LR-2",
+                            LR_3 = "LR-3"))
 
 lr_vp_methods_plot<- ggplot(simu_vp_lr, aes(x = VP_Method, y = VP, fill = Sample_Type)) +
   geom_split_violin(nudge = 0.02) +
@@ -219,12 +224,22 @@ kruskal.test(VP ~ VP_Method, data = simu_vp_vpcl_se_methods %>%
 
 
 #### 3.3 Choosing VIPCAL-SE method   - basic plots ####
+simu_vp_vpcl_se_methods <- simu_vp_vpcl_se_methods %>%
+  mutate(VP_Method = recode(VP_Method, 
+                            VIPCAL_SE = "Combined standard error",
+                            VIPCAL_LMER_SE = "LMER"))
 
-ggplot(simu_vp_vpcl_se_methods, aes(x = VP_Method, y = VP, fill = Sample_Type)) +
-  geom_split_violin(nudge = 0.02) +
+vipcal_se_lmer_vs_combined_std_err_plot<- ggplot(simu_vp_vpcl_se_methods %>% dplyr::filter(Sample_Type == "Lysogenic"), aes(x = VP_Method, y = VP, fill = Sample_Type)) +
+  geom_violin() +
+  labs(x = "Analytical approach",
+       y = "Viral production rate",
+       fill = "Viral production rate type")+
   scale_fill_manual(values = c( "Lytic" = "#d43028", "Lysogenic" = "#4d778b")) +
   theme_classic()
+vipcal_se_lmer_vs_combined_std_err_plot
 
+ggsave(plot = vipcal_se_lmer_vs_combined_std_err_plot, filename = "./figures/vipcal_se_lmer_vs_combined_std_err_plot.png", dpi = 800, width = 70, height = 70, units = "mm")
+ggsave(plot = vipcal_se_lmer_vs_combined_std_err_plot + theme(legend.position = 'none'), filename = "./figures/vipcal_se_lmer_vs_combined_std_err_plot.png", dpi = 800, width = 70, height = 70, units = "mm")
 
 
 #### 4.0 VIPCAL vs VIPCAL_SE ####

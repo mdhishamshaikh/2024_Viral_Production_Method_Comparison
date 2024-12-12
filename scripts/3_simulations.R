@@ -5,10 +5,10 @@ source("./scripts/0_source.R")
 
 #1.0 Creating a simulation dataframe####
 
-# #Set number of dataframes you'd like to create
+# Number of dataframes to create
 simu_length<- 1000
 {
-  set.seed(2023) #Setting seed for reproducibility
+  set.seed(2023) 
   simu_df<- data.frame(matrix(ncol = 5, nrow = 0))
   colnames(simu_df)<- c("Timepoint", "c_Viruses", "Replicate", "Station_Number", "Sample_Type")
   simu_df<- simu_df %>%  mutate(across(!Sample_Type, as.numeric)) %>%
@@ -82,7 +82,7 @@ simu_df<- vp_class_count_data(simu_df)
 
 #Running viralprod calculate function to extract viral production rate
 
-viralprod::vp_calculate(simu_df,        output_dir = "./results/simulation_viral_production2/",
+viralprod::vp_calculate(simu_df,        output_dir = "./results/simulation_viral_production/",
         SR_calc = F,
         BP_endpoint = F)
 
