@@ -69,3 +69,4 @@ rsconnect/
 /data/caribbean_vp_assays/R_Caribbean*
 *.xlsx
 /figures/*
+!/figures/.gitkeep
