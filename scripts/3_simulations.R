@@ -81,12 +81,13 @@ simu_df<- vp_class_count_data(simu_df)
 
 
 #Running viralprod calculate function to extract viral production rate
-
-viralprod::vp_calculate(simu_df,        output_dir = "./results/simulation_viral_production/",
+try(
+viralprod::vp_calculate(simu_df,        output_dir = "./results/simulation_viral_production2/",
+                        methods = c(1,2,3,9,10,12),
         SR_calc = F,
         BP_endpoint = F)
 
-
+)
 # 
 # 
 # # Some checks

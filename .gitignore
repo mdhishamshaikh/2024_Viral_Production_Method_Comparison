@@ -71,3 +71,4 @@ rsconnect/
 *.xlsx
 /figures/*
 !/figures/.gitkeep
+data/vp_literature_survey/2024_vp_assay_literature_survey_tally.xlsx
